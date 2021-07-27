@@ -99,22 +99,24 @@ class AUDACITY_DLL_API ControlToolBar final : public ToolBar {
    void ArrangeButtons();
    TranslatableString StateForStatusBar();
 
+   // Sorted in order of appearance
+
    enum
    {
-      ID_PAUSE_BUTTON = 11000,
       ID_PLAY_BUTTON,
-      ID_STOP_BUTTON,
-      ID_FF_BUTTON,
-      ID_REW_BUTTON,
+      ID_PAUSE_BUTTON = 11000,
       ID_RECORD_BUTTON,
+      ID_STOP_BUTTON,
+      ID_REW_BUTTON,
+      ID_FF_BUTTON,
       BUTTON_COUNT,
    };
 
-   AButton *mRewind;
    AButton *mPlay;
-   AButton *mRecord;
    AButton *mPause;
+   AButton *mRecord;
    AButton *mStop;
+   AButton *mRewind;
    AButton *mFF;
 
    // Activate ergonomic order for transport buttons

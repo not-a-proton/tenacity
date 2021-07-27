@@ -82,11 +82,11 @@ IMPLEMENT_CLASS(ControlToolBar, ToolBar);
 BEGIN_EVENT_TABLE(ControlToolBar, ToolBar)
    EVT_CHAR(ControlToolBar::OnKeyEvent)
    EVT_BUTTON(ID_PLAY_BUTTON,   ControlToolBar::OnPlay)
-   EVT_BUTTON(ID_STOP_BUTTON,   ControlToolBar::OnStop)
+   EVT_BUTTON(ID_PAUSE_BUTTON,  ControlToolBar::OnPause)
    EVT_BUTTON(ID_RECORD_BUTTON, ControlToolBar::OnRecord)
+   EVT_BUTTON(ID_STOP_BUTTON,   ControlToolBar::OnStop)
    EVT_BUTTON(ID_REW_BUTTON,    ControlToolBar::OnRewind)
    EVT_BUTTON(ID_FF_BUTTON,     ControlToolBar::OnFF)
-   EVT_BUTTON(ID_PAUSE_BUTTON,  ControlToolBar::OnPause)
    EVT_IDLE(ControlToolBar::OnIdle)
 END_EVENT_TABLE()
 
@@ -193,9 +193,7 @@ void ControlToolBar::Populate()
    SetBackgroundColour( theTheme.Colour( clrMedium  ) );
    MakeButtonBackgroundsLarge();
 
-   mPause = MakeButton(this, bmpPause, bmpPause, bmpPauseDisabled,
-      ID_PAUSE_BUTTON,  true,  XO("Pause"));
-
+   // Play button
    mPlay = MakeButton(this, bmpPlay, bmpPlay, bmpPlayDisabled,
       ID_PLAY_BUTTON, true, XO("Play"));
    MakeAlternateImages(*mPlay, 1, bmpLoop, bmpLoop, bmpLoopDisabled);
@@ -207,17 +205,25 @@ void ControlToolBar::Populate()
                        bmpSeek, bmpSeek, bmpSeekDisabled);
    mPlay->FollowModifierKeys();
 
+   // Pause button
+   mPause = MakeButton(this, bmpPause, bmpPause, bmpPauseDisabled,
+      ID_PAUSE_BUTTON,  true,  XO("Pause"));
+
+   // Record button
+   mRecord = MakeButton(this, bmpRecord, bmpRecord, bmpRecordDisabled,
+      ID_RECORD_BUTTON, false, XO("Record"));
+
+   // Stop button
    mStop = MakeButton(this, bmpStop, bmpStop, bmpStopDisabled ,
       ID_STOP_BUTTON, false, XO("Stop"));
 
+   // Rewind button
    mRewind = MakeButton(this, bmpRewind, bmpRewind, bmpRewindDisabled,
       ID_REW_BUTTON, false, XO("Skip to Start"));
 
+   // Fast-forward button
    mFF = MakeButton(this, bmpFFwd, bmpFFwd, bmpFFwdDisabled,
       ID_FF_BUTTON, false, XO("Skip to End"));
-
-   mRecord = MakeButton(this, bmpRecord, bmpRecord, bmpRecordDisabled,
-      ID_RECORD_BUTTON, false, XO("Record"));
 
    bool bPreferNewTrack;
    gPrefs->Read("/GUI/PreferNewTrackRecord",&bPreferNewTrack, false);
@@ -253,13 +259,13 @@ void ControlToolBar::RegenerateTooltips()
             // Without shift
             name = wxT("PlayStop");
             break;
+         case ID_PAUSE_BUTTON:
+            name = wxT("Pause");
+            break;
          case ID_RECORD_BUTTON:
             // Without shift
             //name = wxT("Record");
             name = wxT("Record1stChoice");
-            break;
-         case ID_PAUSE_BUTTON:
-            name = wxT("Pause");
             break;
          case ID_STOP_BUTTON:
             name = wxT("Stop");
@@ -281,6 +287,8 @@ void ControlToolBar::RegenerateTooltips()
             // With shift
             commands.push_back( { wxT("PlayLooped"), XO("Loop Play") } );
             break;
+         case ID_PAUSE_BUTTON:
+            break;
          case ID_RECORD_BUTTON:
             // With shift
             {  bool bPreferNewTrack;
@@ -294,19 +302,17 @@ void ControlToolBar::RegenerateTooltips()
                } );
             }
             break;
-         case ID_PAUSE_BUTTON:
-            break;
          case ID_STOP_BUTTON:
-            break;
-         case ID_FF_BUTTON:
-            // With shift
-            commands.push_back( {
-               wxT("SelEnd"), XO("Select to End") } );
             break;
          case ID_REW_BUTTON:
             // With shift
             commands.push_back( {
                wxT("SelStart"), XO("Select to Start") } );
+            break;
+         case ID_FF_BUTTON:
+            // With shift
+            commands.push_back( {
+               wxT("SelEnd"), XO("Select to End") } );
             break;
       }
       ToolBar::SetButtonToolTip(
@@ -377,12 +383,12 @@ void ControlToolBar::ArrangeButtons()
       mRewind->MoveBeforeInTabOrder( mRecord );
       mFF->MoveBeforeInTabOrder( mRecord );
 
-      mSizer->Add( mPause,  0, flags, 2 );
       mSizer->Add( mPlay,   0, flags, 2 );
+      mSizer->Add( mPause,  0, flags, 2 );
+      mSizer->Add( mRecord, 0, flags, 5 );
       mSizer->Add( mStop,   0, flags, 2 );
       mSizer->Add( mRewind, 0, flags, 2 );
       mSizer->Add( mFF,     0, flags, 10 );
-      mSizer->Add( mRecord, 0, flags, 5 );
    }
    else
    {
